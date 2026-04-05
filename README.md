@@ -1,160 +1,99 @@
 # Decentralised Microgrid Controller
-This repository is intended to document the work I do for the software and control systems development for the decentralised microgrid controller. I will use this repository to plan, design, research, and develop code for the project.
+This repository documents the research, architecture, simulation, and software development of an intelligent Energy Management System (EMS) for decentralised hybrid microgrids.
 
-## Main Concepts
-1. Control Systems
-2. Electic Power Systems
-3. Discrete Optimisation
-4. Solar Energy Basics
-5. Optionally: Introduction to Mathematical Optimisation
+The long-term goal of this project is to build an intelligent control system for renewable energy networks using:
+1. Solar generation
+2. Hydrogen energy storage
+3. Autonomous energy dispatch and optimisation
 
-<br>
-
-# 12-Week Development Timeline – Microgrid EMS Controller
-
-| Week | Focus | Learning (Just-in-Time) | Build Output | Success Milestone |
-|------|------|------------------------|-------------|------------------|
-| 1–2 | Foundations + First Simulation | Basic control (PID, feedback), power flow, battery SOC | Python simulation: solar, load, battery SOC loop | Working simulation (even if simple/ugly) |
-| 3–4 | EMS Logic (Rule-Based) | Rule-based control, system constraints | Add decision logic: battery charge/discharge, hydrogen (simulated) | Functional EMS decision engine |
-| 5–6 | System Structuring | Intro optimization concepts, multi-timescale thinking | Refactor into clean modules + add logging/plots | Structured, explainable system |
-| 7–9 | Intelligence + Refinement | Forecasting basics, system architecture patterns | Add forecasting + improved scheduling + cleaner architecture | “Digital twin” microgrid simulation |
-| 10–12 | Hardware Integration (Optional) | Sensors, Raspberry Pi basics (just-in-time) | Connect EMS to simple hardware OR hardware-in-loop | End-to-end prototype (software + optional physical demo) |
+This project begins as a software-only simulation platform, but will progressively evolve toward a hardware-integrated autonomous energy platform.
 
 <br>
 
-## Week 1–2: Foundations + First Simulation
+# Project Vision
+Modern energy systems are becoming increasingly decentralised, renewable, and complex. Traditional EMS and SCADA systems are often expensive, rigid, and not yet adapted to renewable microgrids.
 
-Build a basic Python simulation of a microgrid with:
-- Solar input
-- Load demand
-- Battery SOC tracking
-- Simple energy balancing logic
----
+This project aims to explore a modular, simulation-first EMS architecture.
 
-## Week 1
+# Main Concepts:
+1. TBD
 
-### Day 1: Setup + Direction - 4 April 2026
-- [ DONE ] Create repo structure (research/, simulation/)
-- [ DONE ] Write initial README (project goal + scope)
-- [ DONE ] Create research files:
-      - microgrid_basics.md
-      - control_systems.md
-      - battery_systems.md
-      - ems_basics.md
-      - hydrogen_energy_storage.md
-      - system_architecture.md
-      - README file for research folder
+# System Architecture
 
----
+The EMS is structured into modular layers.
 
-### Day 2: Microgrid Understanding
-- [ ] Study DC microgrid basics (1–2 hrs max)
-- [ ] Add to microgrid_basics.md:
-      - Energy flow model
-      - Power balance equation
-- [ ] Draw system diagram (even rough)
-
----
-
-### Day 3: Control Basics
-- [ ] Start :contentReference[oaicite:0]{index=0} (first modules only)
-- [ ] Learn:
-      - Feedback loop
-      - PID intuition (no deep math)
-- [ ] Add to control_systems.md:
-      - Where control applies in your system
-
----
-
-### Day 4: Battery + Constraints
-- [ ] Study battery SOC basics (1–2 hrs)
-- [ ] Add to battery_systems.md:
-      - SOC limits
-      - Charging/discharging constraints
-
----
-
-### Day 5: FIRST SIMULATION (start coding)
-- [ ] Create simulation script (simulation/main.py)
-- [ ] Define:
-      - solar(t)
-      - load(t)
-- [ ] Write basic loop:
-      - compute surplus/deficit
+```text
+                ┌─────────────────┐
+                │ Simulation      │
+                │ Environment     │
+                │                 │
+                │ Solar Profile   │
+                │ Load Demand     │
+                │ Weather Inputs  │
+                │ Hydrogen State  │
+                │ Battery State   │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ EMS Controller  │
+                │                 │
+                │ Dispatch Logic  │
+                │ Optimisation    │
+                │ Forecast Rules  │
+                │ Safety Rules    │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Decision Engine │
+                │                 │
+                │ Use Solar       │
+                │ Charge Battery  │
+                │ Use Hydrogen    │
+                │ Shed Load       │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Visualisation   │
+                │                 │
+                │ Dashboard       │
+                │ Metrics         │
+                │ Logs            │
+                └─────────────────┘
+```
 
 ---
 
-### Day 6: Add Battery Logic
-- [ ] Implement battery SOC tracking
-- [ ] Add:
-      - charge when surplus
-      - discharge when deficit
+# System Modules
 
----
+### 1. Environment Simulation
 
-### Day 7: Test + Reflect
-- [ ] Run simulation over time (e.g., 24h loop)
-- [ ] Print/log outputs
-- [ ] Write:
-      - Example scenarios in microgrid_basics.md
+Simulates the external microgrid environment.
 
----
 
-## Week 2
+### 2. EMS Controller
 
-### Day 8: Clean Simulation
-- [ ] Refactor code into functions:
-      - get_solar()
-      - get_load()
-      - update_battery()
+The core intelligence layer of the system.
 
----
+### 3. Decision Engine
+Converts controller outputs into actionable energy allocation decisions.
 
-### Day 9: Add Constraints
-- [ ] Add:
-      - battery max capacity
-      - min SOC threshold
-- [ ] Handle edge cases:
-      - battery full
-      - battery empty
 
----
+### 4. Visualisation Layer
+Provides insight into system behaviour and performance.
 
-### Day 10: Introduce Hydrogen (SIMULATED)
-- [ ] Add:
-      - hydrogen storage variable
-- [ ] Logic:
-      - excess → hydrogen
-      - deficit → use hydrogen
+# Repository Structure
 
----
+```
+research/         → Notes, references, and conceptual documentation
+simulation/       → Environment simulation and system models
+controller/       → EMS control logic and dispatch algorithms
+visualisation/    → Dashboards, plotting, and telemetry tools
+docs/             → Architecture diagrams and design notes
+```
 
-### Day 11: EMS Decision Logic
-- [ ] Replace raw logic with structured rules:
-      - priority-based decisions
-- [ ] Document in ems_overview.md
+# Long-Term Goal
 
----
-
-### Day 12: Visualization
-- [ ] Plot:
-      - solar vs load
-      - battery SOC over time
-- [ ] Use matplotlib
-
----
-
-### Day 13: Scenario Testing
-- [ ] Test:
-      - high solar, low load
-      - low solar, high load
-      - battery edge cases
-- [ ] Observe behavior
-
----
-
-### Day 14: Consolidation
-- [ ] Clean code structure
-- [ ] Update all research docs
-- [ ] Write summary:
-      - "How my EMS currently works"
+### The long-term objective is to explore how intelligent decentralised control systems can improve rural energy access and grid resilience.
