@@ -1,8 +1,5 @@
-# Shakthi Energy
-This repository is intended to document the work I do for the software and control systems development for Shakthi Energy. I will use this repository to plan, design, research, and develop code for the  project.
-
-## Project Overview
-HyRTS - Hydrogen-based Roof Top Solar decentralised microgrid
+# Decentralised Microgrid Controller
+This repository is intended to document the work I do for the software and control systems development for the decentralised microgrid controller. I will use this repository to plan, design, research, and develop code for the project.
 
 ## Main Concepts
 1. Control Systems
