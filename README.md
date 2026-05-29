@@ -15,6 +15,10 @@ Modern energy systems are becoming increasingly decentralised, renewable, and co
 
 This project aims to explore a modular, simulation-first EMS architecture.
 
+# Long-Term Goal
+
+### The long-term objective is to explore how intelligent decentralised control systems can improve rural energy access and grid resilience.
+
 # Main Concepts:
 1. TBD
 
@@ -94,6 +98,12 @@ visualisation/    → Dashboards, plotting, and telemetry tools
 docs/             → Architecture diagrams and design notes
 ```
 
-# Long-Term Goal
+# Tooling and Dependencies
 
-### The long-term objective is to explore how intelligent decentralised control systems can improve rural energy access and grid resilience.
+| Tool | Purpose |
+|--------|---------|
+| Python | Primary development language |
+| Git | Version control and development tracking |
+| NumPy | Numerical computation and simulation math |
+| Matplotlib | Data visualization and simulation analysis |
+| Virtual Environment (venv) | Isolated project dependencies |
