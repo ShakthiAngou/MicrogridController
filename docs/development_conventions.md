@@ -1,5 +1,9 @@
 # Development Conventions
 
+# Virtual Environment
+
+source venv/bin/activate
+
 ## Python Module Docstrings
 
 All Python modules should include a module-level docstring.
