@@ -24,7 +24,53 @@ A protoype EMS that is fed simulated sensor data and will output control decisio
 
 EMS-MCU interface that will connect EMS decision-making with embedded device controllers for the microgrid.
 
+#
 
+The EMS is structured into modular layers.
+
+```text
+                ┌─────────────────┐
+                │ Simulation      │
+                │ Environment     │
+                │                 │
+                │ Solar Profile   │
+                │ Load Demand     │
+                │ Weather Inputs  │
+                │ Hydrogen State  │
+                │ Battery State   │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ EMS Controller  │
+                │                 │
+                │ Dispatch Logic  │
+                │ Optimisation    │
+                │ Forecast Rules  │
+                │ Safety Rules    │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Decision Engine │
+                │                 │
+                │ Use Solar       │
+                │ Charge Battery  │
+                │ Use Hydrogen    │
+                │ Shed Load       │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │ Visualisation   │
+                │                 │
+                │ Dashboard       │
+                │ Metrics         │
+                │ Logs            │
+                └─────────────────┘
+```
+
+---
 
 
 
