@@ -1,26 +1,25 @@
 # Decentralised Microgrid Controller
 This repository documents the research, architecture, simulation, and software development of an intelligent Energy Management System (EMS) for decentralised hybrid microgrids.
 
-The long-term goal of this project is to build an intelligent control system for renewable energy networks using:
+The long-term goal of this project is to develop a modular control platform capable of managing an energy system incorporating:
 1. Solar generation
-2. Hydrogen energy storage
-3. Autonomous energy dispatch and optimisation
+2. Short- and long-duration energy storage
+3. Hydrogen energy storage
+4. Intelligent energy dispatch
+5. Energy forecasting and optimisation
 
-This project begins as a software-only simulation platform, but will progressively evolve toward a hardware-integrated autonomous energy platform.
+This project begins as a software-only simulation platform and development environment. The EMS is developed and validated against simulated microgrid components before progressively evolving toward hardware-in-the-loop testing and eventually deployment on physical energy systems.
 
 <br>
 
 # Project Vision
 Modern energy systems are becoming increasingly decentralised, renewable, and complex. Traditional EMS and SCADA systems are often expensive, rigid, and not yet adapted to renewable microgrids.
 
-This project aims to explore a modular, simulation-first EMS architecture.
+This project aims to explore a modular, simulation-first EMS architecture in which the control software is developed independently from the physical energy assets it manages.
 
 # Long-Term Goal
 
 ### The long-term objective is to explore how intelligent decentralised control systems can improve rural energy access and grid resilience.
-
-# Main Concepts:
-1. TBD
 
 # System Architecture
 
@@ -28,7 +27,7 @@ The EMS is structured into modular layers.
 
 ```text
                 ┌─────────────────┐
-                │ Simulation      │
+                │ Microgrid       │
                 │ Environment     │
                 │                 │
                 │ Solar Profile   │
@@ -76,14 +75,12 @@ The EMS is structured into modular layers.
 
 Simulates the external microgrid environment.
 
-
 ### 2. EMS Controller
 
 The core intelligence layer of the system.
 
 ### 3. Decision Engine
 Converts controller outputs into actionable energy allocation decisions.
-
 
 ### 4. Visualisation Layer
 Provides insight into system behaviour and performance.
