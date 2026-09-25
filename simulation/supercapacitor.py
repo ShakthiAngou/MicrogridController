@@ -23,10 +23,10 @@ class Supercapacitor:
         """
 
         if capacity_kwh < 0:
-            raise ValueError("Capacity cannot be negative.")
+            raise ValueError("Supercapacitor's capacity cannot be negative.")
         if not 0 <= initial_energy_kwh <= capacity_kwh:
             raise ValueError(
-                "Initial energy must be between zero and capacity, inclusive."
+                "Initial supercapacitor energy must be between zero and capacity, inclusive."
             )
 
         self.capacity_kwh = capacity_kwh

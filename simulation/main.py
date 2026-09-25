@@ -24,7 +24,7 @@ def main():
     hours_list = []
     solar_generated_list = []
     load_demand_list = []
-    net_after_storage_list = []
+    stored_energy_list = []
     table_data = []
     supercapacitor = Supercapacitor(
         capacity_kwh = 25,
@@ -60,7 +60,7 @@ def main():
         hours_list.append(hour)
         solar_generated_list.append(solar_generated)
         load_demand_list.append(load_demand)
-        net_after_storage_list.append(net_after_storage_power)
+        stored_energy_list.append(supercapacitor.current_energy_kwh)
 
         # Table data
         table_row = [
@@ -71,16 +71,17 @@ def main():
             round(energy_charged_kwh, 2),
             round(energy_discharged_kwh, 2),
             round(net_after_storage_power, 2),
+            round(supercapacitor.current_energy_kwh, 2),
             round(supercapacitor.get_state_of_charge(), 1),
             energy_status
         ]
         table_data.append(table_row)
 
     # Visualise with matplotlib
-    figure, (table_ax, graph_ax) = matplot.subplots(
-        2, 1,
-        figsize=(12, 8),
-        gridspec_kw={'height_ratios': [1, 3]}
+    figure, (table_ax, graph_ax, storage_ax) = matplot.subplots(
+        3, 1,
+        figsize=(12, 11),
+        gridspec_kw={'height_ratios': [1, 2, 1]}
     )
 
     # Table
@@ -90,7 +91,7 @@ def main():
         colLabels=[
             'Hour', 'Solar (kW)', 'Load (kW)', 'Net Before Storage (kW)',
             'Charged (kWh)', 'Discharged (kWh)', 'Net After Storage (kW)',
-            'SoC (%)', 'Status After Storage'
+            'Stored (kWh)', 'SoC (%)', 'Status After Storage'
         ],
         loc='center'
     )
@@ -103,20 +104,25 @@ def main():
 
     graph_ax.plot(hours_list, solar_generated_list, label='Solar Generated', color='orange')
     graph_ax.plot(hours_list, load_demand_list, label='Load Demand', color='blue')
-    graph_ax.plot(
-        hours_list,
-        net_after_storage_list,
-        label='Net Power After Storage',
-        color='green',
-        linestyle='--'
-    )
 
-    graph_ax.grid(
-        True,
-        linestyle='--',
-        alpha=0.7
-    ) # Adding grid for better readability
+    graph_ax.grid(True, linestyle='--', alpha=0.7)
     graph_ax.legend(loc='upper right')
+
+    storage_ax.set_title('Supercapacitor Stored Energy Over 24 Hours')
+    storage_ax.set_xlabel('Time of Day (h)')
+    storage_ax.set_ylabel('Stored Energy (kWh)')
+    storage_ax.set_xlim(0, 23)
+    storage_ax.set_ylim(0, supercapacitor.capacity_kwh)
+    storage_ax.set_xticks(hours_list)
+    storage_ax.plot(
+        hours_list,
+        stored_energy_list,
+        label='Stored Energy',
+        color='green',
+        marker='o',
+        markersize=3
+    )
+    storage_ax.grid(True, linestyle='--', alpha=0.7)
 
     matplot.tight_layout()
     matplot.show()
