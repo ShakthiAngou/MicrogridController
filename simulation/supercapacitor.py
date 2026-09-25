@@ -4,6 +4,7 @@ supercapacitor.py
 Handles supercapacitor energy storage and management.
 """
 
+
 class Supercapacitor:
     """
     Supercapacitor energy storage model.
@@ -13,6 +14,7 @@ class Supercapacitor:
         current_energy_kwh (float): Current stored energy in kWh.
 
     """
+
     def __init__(self, capacity_kwh, initial_energy_kwh):
         """
         Initialize supercapacitor with specified capacity and initial energy.

@@ -14,6 +14,7 @@ Pending work:
 
 import math
 
+
 def get_solar(hour):
     """
     Calculate solar generation for a given hour.

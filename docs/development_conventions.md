@@ -4,6 +4,21 @@
 
 source venv/bin/activate
 
+## Code Formatting and Linting
+
+Run Ruff from the project root before committing or pushing changes.
+
+```bash
+ruff format simulation controller
+ruff check simulation controller
+```
+
+Use the following command to apply automatic lint fixes, including import sorting:
+
+```bash
+ruff check --fix simulation controller
+```
+
 ## Python Module Docstrings
 
 All Python modules should include a module-level docstring.

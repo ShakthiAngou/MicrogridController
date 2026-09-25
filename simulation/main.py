@@ -3,131 +3,137 @@ main.py
 
 Simulation entry point.
 
-Runs the microgrid simulation and displays system outputs.
+Runs the microgrid energy simulation and passes its hourly results to the
+visualization module.
 """
 
-import matplotlib.pyplot as matplot
-
-from solar import get_solar
+from electrolyser import Electrolyser
+from energy_balance import calculate_net_energy, determine_energy_status
+from fuel_cell import FuelCell
+from hydrogen import HydrogenStorage
 from load import get_load
-from energy_balance import calculate_net_energy
-from energy_balance import determine_energy_status
+from solar import get_solar
 from supercapacitor import Supercapacitor
+
+from visualisation import show_simulation_dashboard
+
 
 def main():
     """
     Run a 24-hour microgrid energy simulation.
 
-    Simulates solar generation, load demand, and supercapacitor dispatch.
+    Dispatches energy across solar generation, load demand, a supercapacitor,
+    and hydrogen storage, then displays the hourly results.
     """
-    # Data being collected by simulation in lists
-    hours_list = []
-    solar_generated_list = []
-    load_demand_list = []
-    stored_energy_list = []
-    table_data = []
-    supercapacitor = Supercapacitor(
-        capacity_kwh = 25,
-        initial_energy_kwh = 5
-    )
 
+    # --- Data structure and initialisation ---
+
+    # Step 1: set the timestep and prepare hourly results storage.
+    time_step_hours = 1.0
+    hourly_results = []
+
+    # Step 2: Initialise the supercapacitor, hydrogen storage, electrolyser, and fuel cell.
+    supercapacitor = Supercapacitor(capacity_kwh=25, initial_energy_kwh=15)
+    hydrogen_storage = HydrogenStorage(capacity_kg=1.0, initial_hydrogen_kg=0.5)
+    electrolyser = Electrolyser()
+    fuel_cell = FuelCell()
+
+    # --- Simulation logic ---
     for hour in range(24):
-        # Retrieve system variables
+        # Step 3: Retrieve simulated solar and load values, then calculate the net energy.
         solar_generated = get_solar(hour)
         load_demand = get_load(hour)
         net_power = calculate_net_energy(solar_generated, load_demand)
+        net_energy_kwh = net_power * time_step_hours
 
-        # Each simulation step represents one hour, so kW of imbalance
-        # over the step has the same numeric value in kWh.
-        net_energy_kwh = net_power * 1.0
         energy_charged_kwh = 0.0
         energy_discharged_kwh = 0.0
+        hydrogen_produced_kg = 0.0
+        hydrogen_used_kg = 0.0
+        hydrogen_energy_kwh = 0.0
 
+        # Energy Status: SURPLUS
         if net_energy_kwh > 0:
+            # Step 4: Route surplus to the supercapacitor, then the electrolyser.
             energy_charged_kwh = supercapacitor.charge(net_energy_kwh)
-        elif net_energy_kwh < 0:
-            energy_discharged_kwh = supercapacitor.discharge(-net_energy_kwh)
+            remaining_surplus_kwh = net_energy_kwh - energy_charged_kwh
 
-        # Charging absorbs surplus; discharging supplies part of a deficit.
-        # Remaining surplus is curtailed and remaining deficit is unserved.
+            # Use the electrolyser for surplus the supercapacitor cannot hold.
+            available_hydrogen_capacity_kg = (
+                hydrogen_storage.capacity_kg - hydrogen_storage.current_hydrogen_kg
+            )
+            max_electrolyser_input_kwh = (
+                available_hydrogen_capacity_kg
+                * electrolyser.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
+            )
+            energy_to_electrolyser_kwh = min(
+                remaining_surplus_kwh, max_electrolyser_input_kwh
+            )
+            hydrogen_produced_kg = hydrogen_storage.store(
+                electrolyser.produce_hydrogen(energy_to_electrolyser_kwh)
+            )
+            hydrogen_energy_kwh = (
+                hydrogen_produced_kg * electrolyser.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
+            )
+
+        # Energy Status: DEFICIT
+        elif net_energy_kwh < 0:
+            # Step 5: Cover deficits with the supercapacitor, then the fuel cell.
+            energy_discharged_kwh = supercapacitor.discharge(-net_energy_kwh)
+            remaining_deficit_kwh = -net_energy_kwh - energy_discharged_kwh
+
+            # Use stored hydrogen for any deficit left after supercapacitor dispatch.
+            hydrogen_needed_kg = (
+                remaining_deficit_kwh / fuel_cell.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
+            )
+            hydrogen_used_kg = hydrogen_storage.withdraw(hydrogen_needed_kg)
+            hydrogen_energy_kwh = fuel_cell.generate_electricity(hydrogen_used_kg)
+
+        # Step 6: Calculate the remaining balance and classify the system state.
+        # Remaining surplus is curtailed; remaining deficit is unserved.
         net_after_storage_kwh = (
             net_energy_kwh - energy_charged_kwh + energy_discharged_kwh
         )
-        net_after_storage_power = net_after_storage_kwh / 1.0
+        if net_energy_kwh > 0:
+            net_after_storage_kwh -= hydrogen_energy_kwh
+        elif net_energy_kwh < 0:
+            net_after_storage_kwh += hydrogen_energy_kwh
+
+        # Avoid classifying floating-point rounding residue as an imbalance.
+        if abs(net_after_storage_kwh) < 1e-9:
+            net_after_storage_kwh = 0.0
+
+        # Step 7: Record hourly energy flows and storage levels.
+        net_after_storage_power = net_after_storage_kwh / time_step_hours
         energy_status = determine_energy_status(net_after_storage_power)
 
-        # Append inputs to data lists
-        hours_list.append(hour)
-        solar_generated_list.append(solar_generated)
-        load_demand_list.append(load_demand)
-        stored_energy_list.append(supercapacitor.current_energy_kwh)
+        hourly_results.append(
+            {
+                "hour": hour,
+                "solar_power_kw": solar_generated,
+                "load_power_kw": load_demand,
+                "net_before_storage_kw": net_power,
+                "supercapacitor_charged_kwh": energy_charged_kwh,
+                "supercapacitor_discharged_kwh": energy_discharged_kwh,
+                "hydrogen_produced_kg": hydrogen_produced_kg,
+                "hydrogen_used_kg": hydrogen_used_kg,
+                "net_after_storage_kw": net_after_storage_power,
+                "supercapacitor_energy_kwh": supercapacitor.current_energy_kwh,
+                "supercapacitor_soc_percent": supercapacitor.get_state_of_charge(),
+                "hydrogen_inventory_kg": hydrogen_storage.current_hydrogen_kg,
+                "hydrogen_soc_percent": hydrogen_storage.get_state_of_charge(),
+                "energy_status": energy_status,
+            }
+        )
 
-        # Table data
-        table_row = [
-            hour,
-            round(solar_generated, 2),
-            round(load_demand, 2),
-            round(net_power, 2),
-            round(energy_charged_kwh, 2),
-            round(energy_discharged_kwh, 2),
-            round(net_after_storage_power, 2),
-            round(supercapacitor.current_energy_kwh, 2),
-            round(supercapacitor.get_state_of_charge(), 1),
-            energy_status
-        ]
-        table_data.append(table_row)
+    # --- Output ---
 
-    # Visualise with matplotlib
-    figure, (table_ax, graph_ax, storage_ax) = matplot.subplots(
-        3, 1,
-        figsize=(12, 11),
-        gridspec_kw={'height_ratios': [1, 2, 1]}
+    # Step 8: Pass the completed hourly results and initial capacities to the visualisation dashboard.
+    show_simulation_dashboard(
+        hourly_results,
+        supercapacitor.capacity_kwh,
+        hydrogen_storage.capacity_kg,
     )
-
-    # Table
-    table_ax.axis('off')
-    table_ax.table(
-        cellText=table_data,
-        colLabels=[
-            'Hour', 'Solar (kW)', 'Load (kW)', 'Net Before Storage (kW)',
-            'Charged (kWh)', 'Discharged (kWh)', 'Net After Storage (kW)',
-            'Stored (kWh)', 'SoC (%)', 'Status After Storage'
-        ],
-        loc='center'
-    )
-
-    # Graph
-    graph_ax.set_title('Solar Generation and Load Demand Over 24 Hours')
-
-    graph_ax.set_xlabel('Time of Day (h)')
-    graph_ax.set_ylabel('Power (kW)')
-
-    graph_ax.plot(hours_list, solar_generated_list, label='Solar Generated', color='orange')
-    graph_ax.plot(hours_list, load_demand_list, label='Load Demand', color='blue')
-
-    graph_ax.grid(True, linestyle='--', alpha=0.7)
-    graph_ax.legend(loc='upper right')
-
-    storage_ax.set_title('Supercapacitor Stored Energy Over 24 Hours')
-    storage_ax.set_xlabel('Time of Day (h)')
-    storage_ax.set_ylabel('Stored Energy (kWh)')
-    storage_ax.set_xlim(0, 23)
-    storage_ax.set_ylim(0, supercapacitor.capacity_kwh)
-    storage_ax.set_xticks(hours_list)
-    storage_ax.plot(
-        hours_list,
-        stored_energy_list,
-        label='Stored Energy',
-        color='green',
-        marker='o',
-        markersize=3
-    )
-    storage_ax.grid(True, linestyle='--', alpha=0.7)
-
-    matplot.tight_layout()
-    matplot.show()
-
-    # Todo: Improve plots to be more visually appealing and informative
 
 
 if __name__ == "__main__":

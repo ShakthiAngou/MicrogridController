@@ -10,6 +10,7 @@ Pending work:
     - Model diurnal and seasonal demand variation
 """
 
+
 def get_load(hour):
     """
     Calculate load demand for a given hour.

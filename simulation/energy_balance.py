@@ -30,6 +30,7 @@ def calculate_net_energy(solar, load):
     """
     return solar - load
 
+
 def determine_energy_status(net_energy):
     """
     Output energy status of the system.
