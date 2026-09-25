@@ -1,5 +1,5 @@
 """
-visualization.py
+dashboard.py
 
 Charts and summary table for the microgrid simulation.
 """
