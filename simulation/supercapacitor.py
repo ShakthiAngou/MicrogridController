@@ -15,11 +15,20 @@ class Supercapacitor:
     """
     def __init__(self, capacity_kwh, initial_energy_kwh):
         """
-        Initialize supercapacitor with specified capacity.
+        Initialize supercapacitor with specified capacity and initial energy.
 
         Args:
             capacity_kwh (float): Maximum energy storage capacity in kWh.
+            initial_energy_kwh (float): Initial stored energy in kWh.
         """
+
+        if capacity_kwh < 0:
+            raise ValueError("Capacity cannot be negative.")
+        if not 0 <= initial_energy_kwh <= capacity_kwh:
+            raise ValueError(
+                "Initial energy must be between zero and capacity, inclusive."
+            )
+
         self.capacity_kwh = capacity_kwh
         self.current_energy_kwh = initial_energy_kwh
 
@@ -33,6 +42,9 @@ class Supercapacitor:
         Returns:
             float: Actual energy charged in kWh (may be less than requested if capacity is exceeded).
         """
+        if energy_kwh < 0:
+            raise ValueError("Energy to charge cannot be negative.")
+
         available_capacity = self.capacity_kwh - self.current_energy_kwh
         energy_to_charge = min(energy_kwh, available_capacity)
         self.current_energy_kwh += energy_to_charge
@@ -48,6 +60,9 @@ class Supercapacitor:
         Returns:
             float: Actual energy discharged in kWh (may be less than requested if not enough energy stored).
         """
+        if energy_kwh < 0:
+            raise ValueError("Energy to discharge cannot be negative.")
+
         energy_to_discharge = min(energy_kwh, self.current_energy_kwh)
         self.current_energy_kwh -= energy_to_discharge
         return energy_to_discharge
