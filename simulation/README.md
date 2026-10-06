@@ -11,6 +11,7 @@ This folder contains the component models and the 24-hour microgrid simulation.
 | `hydrogen.py` | Tracks hydrogen inventory and storage capacity. |
 | `electrolyser.py` | Converts surplus electrical energy into hydrogen using the current idealised model. |
 | `fuel_cell.py` | Converts stored hydrogen into electrical energy using the current idealised model. |
+| `hydrogen_system.py` | Coordinates hydrogen storage, electrolysis, and fuel-cell conversion behind one subsystem interface. |
 
 ## Run the simulation
 
@@ -19,6 +20,24 @@ From the project root: ShakthiEnergy
 ```bash
 source venv/bin/activate
 python -m simulation.main
+```
+
+## Run the tests
+
+From the project root, activate the virtual environment and run the full
+pytest suite:
+
+```bash
+source venv/bin/activate
+python -m pytest
+```
+
+Useful alternatives:
+
+```bash
+python -m pytest -q                         # concise output
+python -m pytest tests/test_energy_manager.py # run one test module
+python -m pytest tests/test_supercapacitor.py # run component tests
 ```
 
 ## Current assumptions

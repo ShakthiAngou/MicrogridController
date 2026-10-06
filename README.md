@@ -101,19 +101,17 @@ docs/             → Architecture diagrams and design notes
 
 # Development Roadmap
 
-The project follows a simulation-first development path, progressing from deterministic microgrid control toward predictive optimisation and physical system deployment.
+The project follows a simulation-first development path. Version 1 focuses on turning the existing EMS simulation into a complete, publicly usable software system while keeping the simulation, controller, visualisation, and deployment layers independent.
 
-| Version | Goal | Major Capabilities |
+| Version | Goal | Major capabilities |
 |---|---|---|
-| **V1.0** | Configurable EMS Simulator | Deterministic EMS, operational constraints, configurable system parameters, scenario testing, performance metrics, and simulation visualisation |
-| **V1.1** | Interactive Simulation Tool | Streamlit interface, user-configurable microgrid inputs, simulation controls, interactive plots, and summary metrics |
-| **V1.2** | Deployable Simulator | Docker deployment, hosted Streamlit application, scenario/configuration management, and improved documentation |
-| **V2.0** | Real-World Data Integration | Weather APIs, historical weather datasets, realistic irradiance/PV inputs, and historical load/PV data ingestion |
-| **V2.1** | Forecast-Aware System Modelling | Forecast future solar, load, and storage trajectories and evaluate predicted system states against observed outcomes |
-| **V3.0** | Predictive EMS | ML-based system-state prediction, forecast-aware dispatch, and comparison against the deterministic V1 EMS |
-| **V3.x** | Optimisation & Model Predictive Control | Multi-step dispatch optimisation, reserve management, and reliability/efficiency objectives |
-| **V4.0** | Hardware-in-the-Loop EMS | Physical sensor and component interfaces, hardware-in-the-loop testing, and simulated/physical operating modes |
-| **V5.0** | HyRTS Edge EMS | Local edge deployment, resilient offline operation, telemetry, remote monitoring, and field-deployment architecture |
+| **V1.0** | Publicly usable EMS simulator | Configurable rule-based hybrid microgrid simulation, hydrogen subsystem coordination, scenario testing, operational constraints, structured logging, Streamlit interface, Docker deployment, hosted access, and CI validation |
+| **V2.0** | Real-world data integration | Weather APIs, historical weather datasets, realistic irradiance/PV inputs, and historical load/PV data ingestion |
+| **V2.1** | Forecast-aware system modelling | Forecast future solar, load, and storage trajectories and compare predicted states with observed outcomes |
+| **V3.0** | Predictive EMS | ML-based system-state prediction and forecast-aware dispatch compared with the deterministic V1 EMS |
+| **V3.x** | Optimisation and model predictive control | Multi-step dispatch optimisation, reserve management, and reliability or efficiency objectives |
+| **V4.0** | Hardware-in-the-loop EMS | Physical sensor and component interfaces and simulated or physical operating modes |
+| **V5.0** | HyRTS edge EMS | Local edge deployment, resilient offline operation, telemetry, remote monitoring, and field-deployment architecture |
 
 The long-term development progression is:
 
@@ -141,4 +139,6 @@ Physical HyRTS Deployment
 | Git | Version control and development tracking |
 | NumPy | Numerical computation and simulation math |
 | Matplotlib | Data visualisation and simulation analysis |
+| Ruff | Python formatting and linting |
+| pytest | Automated unit and integration testing |
 | Virtual Environment (venv) | Isolated project dependencies |

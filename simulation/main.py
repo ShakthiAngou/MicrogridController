@@ -10,9 +10,7 @@ and passes hourly results to the visualisation layer.
 from controller.energy_manager import EnergyManager
 from visualisation.dashboard import show_simulation_dashboard
 
-from .electrolyser import Electrolyser
-from .fuel_cell import FuelCell
-from .hydrogen import HydrogenStorage
+from .hydrogen_system import HydrogenSubsystem
 from .load import get_load
 from .solar import get_solar
 from .supercapacitor import Supercapacitor
@@ -32,16 +30,15 @@ def main():
     time_step_hours = 1.0
     hourly_results = []
 
-    # Step 2: Initialise the supercapacitor, hydrogen storage, electrolyser, and fuel cell.
+    # Step 2: Initialise the supercapacitor and hydrogen subsystem.
     supercapacitor = Supercapacitor(capacity_kwh=25, initial_energy_kwh=15)
-    hydrogen_storage = HydrogenStorage(capacity_kg=1.0, initial_hydrogen_kg=0.5)
-    electrolyser = Electrolyser()
-    fuel_cell = FuelCell()
+    hydrogen_system = HydrogenSubsystem(
+        capacity_kg=1.0,
+        initial_hydrogen_kg=0.5,
+    )
     energy_manager = EnergyManager(
         supercapacitor,
-        hydrogen_storage,
-        electrolyser,
-        fuel_cell,
+        hydrogen_system,
     )
 
     # --- Simulation logic ---
@@ -67,7 +64,7 @@ def main():
     show_simulation_dashboard(
         hourly_results,
         supercapacitor.capacity_kwh,
-        hydrogen_storage.capacity_kg,
+        hydrogen_system.capacity_kg,
     )
 
 

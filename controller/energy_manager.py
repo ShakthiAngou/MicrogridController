@@ -4,7 +4,7 @@ energy_manager.py
 V1: Rule-based Energy Management System.
 
 Coordinates energy allocation across the supercapacitor and
-hydrogen storage system.
+hydrogen subsystem.
 """
 
 from .energy_balance import (
@@ -24,17 +24,13 @@ class EnergyManager:
     def __init__(
         self,
         supercapacitor,
-        hydrogen_storage,
-        electrolyser,
-        fuel_cell,
+        hydrogen_system,
     ):
         """
         Initialize the EMS with the available storage components.
         """
         self.supercapacitor = supercapacitor
-        self.hydrogen_storage = hydrogen_storage
-        self.electrolyser = electrolyser
-        self.fuel_cell = fuel_cell
+        self.hydrogen_system = hydrogen_system
 
     def dispatch(self, solar_power_kw, load_power_kw, time_step_hours):
         """
@@ -62,26 +58,9 @@ class EnergyManager:
             supercapacitor_charged_kwh = self.supercapacitor.charge(net_energy_kwh)
             remaining_surplus_kwh = net_energy_kwh - supercapacitor_charged_kwh
 
-            # Use the electrolyser for surplus the supercapacitor cannot hold.
-            available_hydrogen_capacity_kg = (
-                self.hydrogen_storage.capacity_kg
-                - self.hydrogen_storage.current_hydrogen_kg
-            )
-            max_electrolyser_input_kwh = (
-                available_hydrogen_capacity_kg
-                * self.electrolyser.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
-            )
-            energy_to_electrolyser_kwh = min(
-                remaining_surplus_kwh,
-                max_electrolyser_input_kwh,
-            )
-            hydrogen_produced_kg = self.hydrogen_storage.store(
-                self.electrolyser.produce_hydrogen(energy_to_electrolyser_kwh)
-            )
-            hydrogen_energy_kwh = (
-                hydrogen_produced_kg
-                * self.electrolyser.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
-            )
+            hydrogen_result = self.hydrogen_system.store_surplus(remaining_surplus_kwh)
+            hydrogen_produced_kg = hydrogen_result["hydrogen_produced_kg"]
+            hydrogen_energy_kwh = hydrogen_result["energy_stored_kwh"]
 
         # Step 2: Cover deficits with the supercapacitor, then the fuel cell.
         elif net_energy_kwh < 0:
@@ -90,13 +69,9 @@ class EnergyManager:
             )
             remaining_deficit_kwh = -net_energy_kwh - supercapacitor_discharged_kwh
 
-            # Use stored hydrogen for any deficit left after supercapacitor dispatch.
-            hydrogen_needed_kg = (
-                remaining_deficit_kwh
-                / self.fuel_cell.HYDROGEN_ENERGY_CONTENT_KWH_PER_KG
-            )
-            hydrogen_used_kg = self.hydrogen_storage.withdraw(hydrogen_needed_kg)
-            hydrogen_energy_kwh = self.fuel_cell.generate_electricity(hydrogen_used_kg)
+            hydrogen_result = self.hydrogen_system.supply_deficit(remaining_deficit_kwh)
+            hydrogen_used_kg = hydrogen_result["hydrogen_used_kg"]
+            hydrogen_energy_kwh = hydrogen_result["energy_supplied_kwh"]
 
         # Step 3: Calculate the remaining balance and classify the system state.
         # Remaining surplus is curtailed; remaining deficit is unserved.
@@ -127,7 +102,7 @@ class EnergyManager:
             "net_after_storage_kw": net_after_storage_kw,
             "supercapacitor_energy_kwh": (self.supercapacitor.current_energy_kwh),
             "supercapacitor_soc_percent": (self.supercapacitor.get_state_of_charge()),
-            "hydrogen_inventory_kg": (self.hydrogen_storage.current_hydrogen_kg),
-            "hydrogen_soc_percent": (self.hydrogen_storage.get_state_of_charge()),
+            "hydrogen_inventory_kg": self.hydrogen_system.current_hydrogen_kg,
+            "hydrogen_soc_percent": self.hydrogen_system.get_state_of_charge(),
             "energy_status": determine_energy_status(net_after_storage_kw),
         }

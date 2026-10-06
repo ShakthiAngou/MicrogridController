@@ -9,14 +9,29 @@ source venv/bin/activate
 Run Ruff from the project root before committing or pushing changes.
 
 ```bash
-ruff format simulation controller
-ruff check simulation controller
+ruff format simulation controller visualisation tests
+ruff check simulation controller visualisation tests
 ```
 
 Use the following command to apply automatic lint fixes, including import sorting:
 
 ```bash
-ruff check --fix simulation controller
+ruff check --fix simulation controller visualisation tests
+```
+
+## Testing
+
+Run the full pytest suite from the project root:
+
+```bash
+python -m pytest
+```
+
+Use concise output or run a specific test module when needed:
+
+```bash
+python -m pytest -q
+python -m pytest tests/test_energy_manager.py
 ```
 
 ## Python Module Docstrings
